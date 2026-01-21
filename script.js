@@ -3,6 +3,88 @@
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
+  // Intro overlay (short greeting, then reveal site)
+  const intro = document.getElementById("intro");
+  const introSkip = intro?.querySelector(".intro-skip");
+  const introHello = intro?.querySelector(".intro-hello");
+
+  const prefersReducedMotion =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const finishIntro = (shouldScrollToHash) => {
+    document.body.classList.remove("is-intro");
+    if (intro instanceof HTMLElement) {
+      intro.classList.add("is-leaving");
+      // remove after fade
+      window.setTimeout(() => intro.remove(), prefersReducedMotion ? 0 : 2600);
+    }
+
+    if (shouldScrollToHash && window.location.hash) {
+      const id = window.location.hash.slice(1);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    }
+  };
+
+  if (intro instanceof HTMLElement) {
+    // Typewriter effect (note: browsers clamp 1ms timers; this is as fast as allowed)
+    const fullText =
+      (introHello instanceof HTMLElement && introHello.dataset.text) || "Hello, I'm Tebogo.";
+
+    if (introHello instanceof HTMLElement) introHello.textContent = "";
+
+    // Slow, readable typing speed
+    const speedMs = 65;
+    let i = 0;
+
+    const typeNext = () => {
+      if (!(introHello instanceof HTMLElement)) return;
+      if (i >= fullText.length) {
+        // Done typing — add animated purple emoji
+        const sparkle = document.createElement("span");
+        sparkle.className = "intro-sparkle";
+        sparkle.textContent = " 💜";
+        sparkle.setAttribute("aria-hidden", "true");
+        introHello.appendChild(sparkle);
+        
+        // After sparkle appears, ALWAYS wait exactly 1.8 seconds then slowly fade out to site
+        window.setTimeout(() => {
+          const shouldScrollToHash = Boolean(window.location.hash);
+          finishIntro(shouldScrollToHash);
+        }, 1800); // Exactly 1.8 seconds pause to see sparkle, then fade
+        return;
+      }
+      introHello.textContent = fullText.slice(0, i + 1);
+      i += 1;
+      window.setTimeout(typeNext, speedMs);
+    };
+
+    // Always type (even if reduced motion is enabled); reduced motion only affects fades/scrolling.
+    requestAnimationFrame(typeNext);
+
+    const exitNow = () => {
+      const shouldScrollToHash = Boolean(window.location.hash);
+      finishIntro(shouldScrollToHash);
+    };
+
+    if (introSkip instanceof HTMLElement) {
+      introSkip.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        exitNow();
+      });
+      // Put focus on Enter button for keyboard users
+      window.setTimeout(() => introSkip.focus(), 0);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") exitNow();
+    });
+
+  } else {
+    document.body.classList.remove("is-intro");
+  }
+
   // Scroll reveal animations
   const revealEls = Array.from(document.querySelectorAll("[data-reveal]"));
   if ("IntersectionObserver" in window && revealEls.length) {
@@ -64,6 +146,42 @@
     });
   }
 
+  // Hackathon wins section: hidden by default, reveal on demand
+  const hackathonSection = document.getElementById("hackathonwins");
+
+  const showHackathonWins = (shouldScroll) => {
+    if (!(hackathonSection instanceof HTMLElement)) return;
+
+    const wasHidden = hackathonSection.hasAttribute("hidden");
+    hackathonSection.removeAttribute("hidden");
+
+    // Ensure reveal animations don't get stuck when shown later
+    if (wasHidden) {
+      requestAnimationFrame(() => {
+        hackathonSection
+          .querySelectorAll("[data-reveal]")
+          .forEach((el) => el.classList.add("is-visible"));
+      });
+    }
+
+    if (shouldScroll) {
+      hackathonSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Reveal Hackathon Wins ONLY from the Featured Projects button
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    const a = t.closest("[data-show-hackathonwins]");
+    if (!a) return;
+
+    e.preventDefault();
+    showHackathonWins(true);
+    history.pushState(null, "", "#hackathonwins");
+    closeNav();
+  });
+
   // Expandable achievement cards
   const expandableCards = document.querySelectorAll("[data-expandable]");
   expandableCards.forEach((card) => {
@@ -109,7 +227,7 @@
     );
   }
 
-  // Experience roadmap: start at RCL only, click node to unfold (paper drop-down)
+  // Experience roadmap (paper drop-down)
   const experience = document.querySelector("[data-experience]");
   if (experience instanceof HTMLElement) {
     const items = Array.from(experience.querySelectorAll("[data-xp-item]")).filter(
@@ -145,23 +263,26 @@
 
         const isCollapsed = experience.classList.contains("is-collapsed");
         if (isCollapsed) {
-          // Unfold all items (paper drop-down)
+          // Move active item to right and show all items
           setExpanded(true);
+          // Ensure active item stays active
+          if (!it.classList.contains("is-active")) {
+            setActive(it);
+          }
           return;
         }
 
-        // If expanded: focus this item, then fold back to single item
+        // If expanded: focus this item, then fold back to single centered item
         setActive(it);
         setExpanded(false);
-        it.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        // Scroll to keep the section in view
+        experience.scrollIntoView({ block: "nearest", behavior: "smooth" });
       });
     });
   }
 
-  // Carousels (Achievements media placeholders)
+  // Carousels (auto-playing slideshows)
   const carousels = document.querySelectorAll("[data-carousel]");
-
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
   carousels.forEach((carousel) => {
     if (!(carousel instanceof HTMLElement)) return;
@@ -175,15 +296,37 @@
     if (!(track instanceof HTMLElement) || slides.length === 0 || !(dots instanceof HTMLElement)) return;
 
     let index = 0;
+    // Will be assigned once autoplay setup is created
+    let restartAutoplay = () => {};
+
+    const wrapIndex = (n) => {
+      const len = slides.length;
+      return ((n % len) + len) % len;
+    };
 
     const setIndex = (nextIndex) => {
-      index = clamp(nextIndex, 0, slides.length - 1);
+      index = wrapIndex(nextIndex);
       track.style.transform = `translateX(${-index * 100}%)`;
 
       dots.querySelectorAll(".carousel-dot").forEach((dot, i) => {
         if (!(dot instanceof HTMLElement)) return;
         dot.setAttribute("aria-selected", i === index ? "true" : "false");
         dot.setAttribute("tabindex", i === index ? "0" : "-1");
+      });
+
+      // Pause any videos on non-active slides
+      slides.forEach((slide, i) => {
+        if (!(slide instanceof HTMLElement)) return;
+        if (i === index) return;
+        slide.querySelectorAll("video").forEach((v) => {
+          if (v instanceof HTMLVideoElement) {
+            try {
+              v.pause();
+            } catch {
+              // ignore
+            }
+          }
+        });
       });
     };
 
@@ -195,20 +338,88 @@
       btn.className = "carousel-dot";
       btn.setAttribute("role", "tab");
       btn.setAttribute("aria-label", `Slide ${i + 1}`);
-      btn.addEventListener("click", () => setIndex(i));
+      btn.addEventListener("click", () => {
+        setIndex(i);
+        restartAutoplay();
+      });
       dots.appendChild(btn);
     });
 
-    if (prev instanceof HTMLElement) prev.addEventListener("click", () => setIndex(index - 1));
-    if (next instanceof HTMLElement) next.addEventListener("click", () => setIndex(index + 1));
+    if (prev instanceof HTMLElement)
+      prev.addEventListener("click", () => {
+        setIndex(index - 1);
+        restartAutoplay();
+      });
+    if (next instanceof HTMLElement)
+      next.addEventListener("click", () => {
+        setIndex(index + 1);
+        restartAutoplay();
+      });
 
     // Keyboard support when focused inside carousel
     carousel.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") setIndex(index - 1);
-      if (e.key === "ArrowRight") setIndex(index + 1);
+      if (e.key === "ArrowLeft") {
+        setIndex(index - 1);
+        restartAutoplay();
+      }
+      if (e.key === "ArrowRight") {
+        setIndex(index + 1);
+        restartAutoplay();
+      }
     });
 
     setIndex(0);
+
+    // Autoplay slideshow (paused on hover/focus; pauses while a video plays)
+    const autoplayEnabled = !prefersReducedMotion;
+    const intervalMs = carousel.classList.contains("cert-carousel") ? 5200 : 4200;
+    let timer = 0;
+
+    const stopAutoplay = () => {
+      if (timer) window.clearInterval(timer);
+      timer = 0;
+    };
+
+    const isActiveSlideVideoPlaying = () => {
+      const active = slides[index];
+      if (!(active instanceof HTMLElement)) return false;
+      const v = active.querySelector("video");
+      return v instanceof HTMLVideoElement && !v.paused && !v.ended;
+    };
+
+    const startAutoplay = () => {
+      if (!autoplayEnabled) return;
+      stopAutoplay();
+      timer = window.setInterval(() => {
+        if (isActiveSlideVideoPlaying()) return;
+        setIndex(index + 1);
+      }, intervalMs);
+    };
+
+    restartAutoplay = () => {
+      stopAutoplay();
+      startAutoplay();
+    };
+
+    carousel.addEventListener("mouseenter", stopAutoplay);
+    carousel.addEventListener("mouseleave", startAutoplay);
+    carousel.addEventListener("focusin", stopAutoplay);
+    carousel.addEventListener("focusout", startAutoplay);
+
+    // If the carousel contains videos, stop autoplay while playing
+    carousel.querySelectorAll("video").forEach((v) => {
+      if (!(v instanceof HTMLVideoElement)) return;
+      v.addEventListener("play", stopAutoplay);
+      v.addEventListener("pause", startAutoplay);
+      v.addEventListener("ended", startAutoplay);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopAutoplay();
+      else startAutoplay();
+    });
+
+    startAutoplay();
   });
 
   // Contact form → opens mailto with prefilled content (no backend required)
