@@ -440,6 +440,41 @@ strong {
   background: var(--panel-2);
 }
 
+.pill-icon {
+  padding: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pill-icon img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0.95);
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.pill-icon:hover img {
+  filter: brightness(1.1);
+  transform: scale(1.08);
+}
+
+.button img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0.95);
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.button:hover img {
+  filter: brightness(1.1);
+  transform: scale(1.08);
+}
+
 .hero-card .card {
   background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 90%, transparent), var(--panel));
   border: 1px solid var(--border);
@@ -731,6 +766,39 @@ spline-viewer.spline {
 .project-card:hover .project-media img {
   transform: scale(1.03);
   filter: brightness(1.04) saturate(1.05);
+}
+
+.project-placeholder {
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+  border: 2px dashed var(--accent);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 300ms ease;
+}
+
+.project-placeholder span {
+  padding: 0.5rem 1rem;
+  background: rgba(138, 43, 226, 0.15);
+  border-radius: 8px;
+  color: var(--accent);
+}
+
+.project-card:hover .project-placeholder {
+  border-color: var(--glow-purple);
+  background: linear-gradient(135deg, #1f1f3a 0%, #1a2744 50%, #141428 100%);
+  box-shadow: inset 0 0 30px rgba(138, 43, 226, 0.1);
+}
+
+.project-card:hover .project-placeholder span {
+  background: rgba(138, 43, 226, 0.25);
 }
 
 .project-card {
@@ -1072,14 +1140,40 @@ spline-viewer.spline {
 /* Fold-down / paper-unfurl effect */
 /* (keep only ONE .timeline.roadmap block; perspective belongs to the main roadmap block above) */
 
-.timeline.roadmap.is-collapsed .t-item:not(.is-active) {
-  display: none;
+.timeline.roadmap .t-item {
+  transition: 
+    transform 2500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 3000ms ease,
+    max-height 3000ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    margin 2500ms ease,
+    filter 2000ms ease;
 }
+
+/* Collapsed state: hide non-active items very slowly */
+.timeline.roadmap.is-collapsed .t-item:not(.is-active) {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border-color: transparent;
+  pointer-events: none;
+  filter: blur(8px);
+  transform: translateY(-30px) scale(0.9);
+}
+
+/* Staggered collapse timing (reverse order - last items collapse first) */
+.timeline.roadmap.is-collapsed .t-item:nth-child(5):not(.is-active) { transition-delay: 0ms; }
+.timeline.roadmap.is-collapsed .t-item:nth-child(4):not(.is-active) { transition-delay: 800ms; }
+.timeline.roadmap.is-collapsed .t-item:nth-child(3):not(.is-active) { transition-delay: 1600ms; }
+.timeline.roadmap.is-collapsed .t-item:nth-child(2):not(.is-active) { transition-delay: 2400ms; }
+.timeline.roadmap.is-collapsed .t-item:nth-child(1):not(.is-active) { transition-delay: 3200ms; }
 
 .timeline.roadmap.is-collapsed .t-item.is-active {
   max-width: min(600px, 90%);
   margin: 0 auto;
-  transition: all 520ms ease;
+  transform: rotateX(0);
+  transition-delay: 4000ms;
 }
 
 .timeline.roadmap.is-expanded .t-item.is-active {
@@ -1089,16 +1183,20 @@ spline-viewer.spline {
 }
 
 .timeline.roadmap.is-expanded .t-item {
-  display: block;
-  animation: paperDrop 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
   opacity: 1;
-  transform: rotateX(0);
+  max-height: 500px;
+  overflow: visible;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+  animation: paperDrop 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.timeline.roadmap.is-expanded .t-item:nth-child(2) { animation-delay: 60ms; }
-.timeline.roadmap.is-expanded .t-item:nth-child(3) { animation-delay: 120ms; }
-.timeline.roadmap.is-expanded .t-item:nth-child(4) { animation-delay: 180ms; }
-.timeline.roadmap.is-expanded .t-item:nth-child(5) { animation-delay: 240ms; }
+/* Staggered expand timing */
+.timeline.roadmap.is-expanded .t-item:nth-child(1) { animation-delay: 0ms; }
+.timeline.roadmap.is-expanded .t-item:nth-child(2) { animation-delay: 100ms; }
+.timeline.roadmap.is-expanded .t-item:nth-child(3) { animation-delay: 200ms; }
+.timeline.roadmap.is-expanded .t-item:nth-child(4) { animation-delay: 300ms; }
+.timeline.roadmap.is-expanded .t-item:nth-child(5) { animation-delay: 400ms; }
 
 @keyframes paperDrop {
   from {
@@ -1111,14 +1209,6 @@ spline-viewer.spline {
     transform: translateY(0) rotateX(0);
     filter: blur(0);
   }
-}
-
-.timeline.roadmap .t-item {
-  transition: transform 520ms ease, opacity 320ms ease;
-}
-
-.timeline.roadmap.is-collapsed .t-item.is-active {
-  transform: rotateX(0);
 }
 
 /* Make Experience cards read as “grid”, not full-width */
@@ -1504,6 +1594,21 @@ textarea:focus-visible {
 /* Summary: soft “capsule” corners */
 #summary .panel {
   border-radius: 26px 14px 26px 14px;
+}
+
+/* Skills: no background or border */
+#skills .panel {
+  background: transparent !important;
+  border: none !important;
+  padding: 0;
+  box-shadow: none !important;
+}
+
+#skills .panel:hover {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none;
 }
 
 /* Skills: alternate corner emphasis */

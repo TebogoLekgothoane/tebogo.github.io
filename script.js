@@ -253,6 +253,9 @@
     if (initial) setActive(initial);
     setExpanded(false);
 
+    // Track if user manually interacted (to not override their choice)
+    let userInteracted = false;
+
     items.forEach((it) => {
       const node = it.querySelector(".xp-node");
       if (!(node instanceof HTMLElement)) return;
@@ -260,6 +263,7 @@
       node.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        userInteracted = true;
 
         const isCollapsed = experience.classList.contains("is-collapsed");
         if (isCollapsed) {
@@ -279,6 +283,54 @@
         experience.scrollIntoView({ block: "nearest", behavior: "smooth" });
       });
     });
+
+    // Scroll-based auto-expand/collapse using IntersectionObserver
+    if ("IntersectionObserver" in window) {
+      // Observer for when experience section enters viewport (expand)
+      const expandObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && experience.classList.contains("is-collapsed")) {
+              // Auto-expand when scrolled into view
+              setExpanded(true);
+            }
+          });
+        },
+        { root: null, rootMargin: "-20% 0px -20% 0px", threshold: 0 }
+      );
+
+      // Track scroll direction for smarter collapse
+      let lastScrollY = window.scrollY;
+      let scrollDirection = "down";
+
+      window.addEventListener("scroll", () => {
+        const currentScrollY = window.scrollY;
+        scrollDirection = currentScrollY < lastScrollY ? "up" : "down";
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+
+      // Observer for when experience section leaves viewport (collapse)
+      // Uses threshold to detect when section starts leaving top of viewport
+      const collapseObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            // Collapse when scrolling up and section visibility drops below 30%
+            if (
+              experience.classList.contains("is-expanded") &&
+              scrollDirection === "up" &&
+              entry.intersectionRatio < 0.3
+            ) {
+              setExpanded(false);
+              userInteracted = false; // Reset for next scroll
+            }
+          });
+        },
+        { root: null, rootMargin: "0px", threshold: [0, 0.1, 0.2, 0.3, 0.5] }
+      );
+
+      expandObserver.observe(experience);
+      collapseObserver.observe(experience);
+    }
   }
 
   // Carousels (auto-playing slideshows)
