@@ -11,7 +11,7 @@
   const prefersReducedMotion =
     window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const finishIntro = (shouldScrollToHash) => {
+  const finishIntro = () => {
     document.body.classList.remove("is-intro");
     if (intro instanceof HTMLElement) {
       intro.classList.add("is-leaving");
@@ -19,11 +19,12 @@
       window.setTimeout(() => intro.remove(), prefersReducedMotion ? 0 : 2600);
     }
 
-    if (shouldScrollToHash && window.location.hash) {
-      const id = window.location.hash.slice(1);
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    // Always start at the top after intro (avoid landing on a deep-linked section like #hackathonwins)
+    if (window.location.hash) {
+      const cleanUrl = `${window.location.pathname}${window.location.search}`;
+      history.replaceState(null, "", cleanUrl);
     }
+    window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
 
   if (intro instanceof HTMLElement) {
@@ -49,8 +50,7 @@
         
         // After sparkle appears, ALWAYS wait exactly 1.8 seconds then slowly fade out to site
         window.setTimeout(() => {
-          const shouldScrollToHash = Boolean(window.location.hash);
-          finishIntro(shouldScrollToHash);
+          finishIntro();
         }, 1800); // Exactly 1.8 seconds pause to see sparkle, then fade
         return;
       }
@@ -63,8 +63,7 @@
     requestAnimationFrame(typeNext);
 
     const exitNow = () => {
-      const shouldScrollToHash = Boolean(window.location.hash);
-      finishIntro(shouldScrollToHash);
+      finishIntro();
     };
 
     if (introSkip instanceof HTMLElement) {
@@ -97,7 +96,7 @@
           io.unobserve(entry.target);
         });
       },
-      { root: null, rootMargin: "0px 0px -10% 0px", threshold: 0.12 }
+      { root: null, rootMargin: "0px 0px -5% 0px", threshold: 0.08 }
     );
 
     revealEls.forEach((el, i) => {
@@ -110,6 +109,131 @@
   } else {
     // Fallback: just show everything
     revealEls.forEach((el) => el.classList.add("is-visible"));
+  }
+
+  // Professional summary: collapse main card to the right on scroll (desktop)
+  const proSummary = document.querySelector("[data-pro-summary]");
+  if (proSummary instanceof HTMLElement && "IntersectionObserver" in window) {
+    const isDesktop = () => !window.matchMedia("(max-width: 920px)").matches;
+
+    // Keep a lightweight scroll direction signal
+    let lastScrollY = window.scrollY;
+    let scrollDirection = "down";
+    window.addEventListener(
+      "scroll",
+      () => {
+        const y = window.scrollY;
+        scrollDirection = y < lastScrollY ? "up" : "down";
+        lastScrollY = y;
+      },
+      { passive: true }
+    );
+
+    const setProExpanded = (expanded) => {
+      if (!isDesktop()) {
+        proSummary.classList.remove("is-collapsed");
+        proSummary.classList.remove("is-expanded");
+        return;
+      }
+      proSummary.classList.toggle("is-expanded", expanded);
+      proSummary.classList.toggle("is-collapsed", !expanded);
+    };
+
+    // Initial state
+    setProExpanded(false);
+
+    const proObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!(entry.target instanceof HTMLElement)) return;
+          if (!isDesktop()) return;
+
+          // Expand when entering while scrolling down
+          if (entry.isIntersecting && scrollDirection === "down") {
+            setProExpanded(true);
+          }
+
+          // Collapse when leaving upwards (or mostly out) while scrolling up
+          if (scrollDirection === "up" && entry.intersectionRatio < 0.35) {
+            setProExpanded(false);
+          }
+        });
+      },
+      { root: null, rootMargin: "-10% 0px -35% 0px", threshold: [0, 0.12, 0.35, 0.6] }
+    );
+
+    proObserver.observe(proSummary);
+
+    // Re-evaluate on resize/orientation changes
+    window.addEventListener(
+      "resize",
+      () => {
+        setProExpanded(proSummary.classList.contains("is-expanded"));
+      },
+      { passive: true }
+    );
+  }
+
+  // Featured Projects: as you scroll down, cards collapse left/right (desktop)
+  const featuredProjects = document.querySelector("[data-featured-projects]");
+  if (featuredProjects instanceof HTMLElement && "IntersectionObserver" in window) {
+    const fpBreak = featuredProjects.querySelector("[data-fp-break]");
+    const isDesktop = () => !window.matchMedia("(max-width: 920px)").matches;
+
+    let lastScrollY = window.scrollY;
+    let scrollDirection = "down";
+    window.addEventListener(
+      "scroll",
+      () => {
+        const y = window.scrollY;
+        scrollDirection = y < lastScrollY ? "up" : "down";
+        lastScrollY = y;
+      },
+      { passive: true }
+    );
+
+    const setCollapsed = (collapsed) => {
+      if (!isDesktop()) {
+        featuredProjects.classList.remove("is-collapsed");
+        featuredProjects.classList.add("is-expanded");
+        return;
+      }
+      featuredProjects.classList.toggle("is-collapsed", collapsed);
+      featuredProjects.classList.toggle("is-expanded", !collapsed);
+    };
+
+    setCollapsed(false); // show all projects first
+
+    if (fpBreak instanceof HTMLElement) {
+      const fpObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!isDesktop()) return;
+
+            // When scrolling down and you reach the "break" (second row), start collapsing.
+            if (scrollDirection === "down" && entry.isIntersecting) {
+              setCollapsed(true);
+            }
+
+            // When scrolling up above the break, restore the original expanded layout.
+            if (scrollDirection === "up" && !entry.isIntersecting) {
+              setCollapsed(false);
+            }
+          });
+        },
+        { root: null, rootMargin: "-10% 0px -10% 0px", threshold: 0 }
+      );
+
+      fpObserver.observe(fpBreak);
+    }
+
+    window.addEventListener(
+      "resize",
+      () => {
+        setCollapsed(featuredProjects.classList.contains("is-collapsed"));
+      },
+      { passive: true }
+    );
   }
 
   // Mobile nav
@@ -183,12 +307,27 @@
   });
 
   // Expandable achievement cards
-  const expandableCards = document.querySelectorAll("[data-expandable]");
+  const hackathonWinsSection = document.getElementById("hackathonwins");
+  const expandableCards = Array.from(document.querySelectorAll("[data-expandable]"));
+  const toggleByCard = new Map();
+
+  const syncCollapsedState = (card, toggle, expanded) => {
+    card.classList.toggle("is-expanded", expanded);
+    if (toggle instanceof HTMLElement) {
+      toggle.setAttribute("aria-expanded", String(expanded));
+      toggle.setAttribute("aria-label", expanded ? "Collapse details" : "Expand details");
+    }
+  };
+
   expandableCards.forEach((card) => {
     if (!(card instanceof HTMLElement)) return;
     
     const toggle = card.querySelector(".expand-toggle");
     if (!toggle) return;
+    toggleByCard.set(card, toggle);
+
+    // Ensure initial state is collapsed
+    syncCollapsedState(card, toggle, false);
 
     // Click toggle button
     toggle.addEventListener("click", (e) => {
@@ -217,14 +356,38 @@
   });
 
   function toggleCard(card, toggle) {
-    const isExpanded = card.classList.toggle("is-expanded");
-    toggle.setAttribute("aria-expanded", String(isExpanded));
-    
-    // Update aria-label
-    toggle.setAttribute(
-      "aria-label",
-      isExpanded ? "Collapse details" : "Expand details"
+    const isExpanded = !card.classList.contains("is-expanded");
+    syncCollapsedState(card, toggle, isExpanded);
+  }
+
+  // Hackathon wins: auto-show descriptions while scrolling through the section
+  // Each card expands when it enters view and collapses when it leaves.
+  if (hackathonWinsSection instanceof HTMLElement && expandableCards.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!(entry.target instanceof HTMLElement)) return;
+          const card = entry.target;
+          const toggle = toggleByCard.get(card);
+
+          // Only auto-control cards inside Hackathon Wins
+          if (!hackathonWinsSection.contains(card)) return;
+
+          if (entry.isIntersecting) {
+            syncCollapsedState(card, toggle, true);
+          } else {
+            syncCollapsedState(card, toggle, false);
+          }
+        });
+      },
+      { root: null, rootMargin: "-15% 0px -35% 0px", threshold: [0, 0.12, 0.35, 0.6] }
     );
+
+    expandableCards.forEach((card) => {
+      if (!(card instanceof HTMLElement)) return;
+      if (!hackathonWinsSection.contains(card)) return;
+      io.observe(card);
+    });
   }
 
   // Experience roadmap (paper drop-down)

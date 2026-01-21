@@ -18,6 +18,11 @@
   --glow-purple: rgba(124, 58, 237, 0.42);
   --glow-purple-2: rgba(124, 58, 237, 0.22);
   --glow-purple-strong: rgba(192, 132, 252, 0.48);
+  --glow-purple-neon: rgba(192, 132, 252, 0.92);
+
+  /* Pink accent glow (small “dash” for depth) */
+  --glow-pink: rgba(236, 72, 153, 0.38);   /* pink-500-ish */
+  --glow-pink-2: rgba(236, 72, 153, 0.18);
 
   --radius: 16px;
   --radius-sm: 12px;
@@ -63,8 +68,10 @@ body.is-intro {
 .intro {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 1.25rem;
   z-index: 2000;
   background: #000;
@@ -72,6 +79,28 @@ body.is-intro {
   text-rendering: optimizeLegibility;
   opacity: 1;
   transition: opacity 2400ms ease, visibility 2400ms ease;
+}
+
+.intro-profile {
+  width: clamp(150px, 30vw, 280px);
+  height: auto;
+  border-radius: 0;
+  object-fit: contain;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 2rem;
+  animation: profileFadeIn 1s ease-out forwards;
+}
+
+@keyframes profileFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .intro-card {
@@ -255,22 +284,17 @@ strong {
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #0b0d12;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 10px 25px rgba(215, 215, 215, 0.18);
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.25);
   transition: box-shadow 280ms ease, transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .brand:hover .brand-mark {
-  box-shadow: 0 15px 35px rgba(215, 215, 215, 0.3), 0 0 20px var(--glow-purple-2);
-  transform: rotate(8deg);
+  box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4), 0 0 20px var(--glow-purple-2);
+  transform: scale(1.08);
 }
 
 .brand-name {
@@ -376,14 +400,15 @@ strong {
 
 .hero-inner {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  align-items: start; /* align spline with name */
-  gap: 1rem; /* bring spline closer to the name */
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: 1.5rem;
 }
 
 .hero-card {
-  /* pull the spline panel closer to the title block */
-  margin-top: 0.15rem;
+  /* Align with the left side content */
+  display: flex;
+  flex-direction: column;
 }
 
 .eyebrow {
@@ -484,22 +509,21 @@ strong {
 }
 
 .spline-wrap {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 90%, transparent), var(--panel));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
+  flex: 1;
   /* more “full screen” on desktop */
-  height: min(720px, calc(100vh - 140px));
+  height: min(800px, calc(100vh - 100px));
+  min-height: 500px;
   animation: float 6s ease-in-out infinite;
   transition: transform 380ms ease, box-shadow 380ms ease;
 }
 
 .spline-wrap:hover {
   transform: translateY(-5px) scale(1.01);
-  box-shadow: 
-    0 35px 90px rgba(0, 0, 0, 0.8),
-    0 0 50px var(--glow-purple-2);
 }
 
 @keyframes float {
@@ -515,6 +539,8 @@ spline-viewer.spline {
   width: 100%;
   height: 100%;
   display: block;
+  transform: scale(1.8);
+  transform-origin: center center;
 }
 
 .card-top {
@@ -582,7 +608,96 @@ spline-viewer.spline {
 }
 
 .grid.three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ----------
+   Professional summary: scroll-collapse to the right (desktop)
+   ---------- */
+#summary [data-pro-summary] {
+  position: relative;
+}
+
+#summary [data-pro-main],
+#summary [data-pro-facts] {
+  will-change: transform, opacity;
+}
+
+/* Desktop-only collapse/reveal */
+@media (min-width: 921px) {
+  #summary [data-pro-summary] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  /* Collapsed: only main card centered; facts hidden */
+  #summary [data-pro-summary].is-collapsed [data-pro-main] {
+    grid-column: 1 / -1;
+    max-width: 760px;
+    justify-self: center;
+    transform: translateX(0);
+  }
+
+  #summary [data-pro-summary].is-collapsed [data-pro-facts] {
+    opacity: 0;
+    transform: translateX(-22px);
+    pointer-events: none;
+    max-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-color: transparent;
+  }
+
+  /* Expanded: main moves to right, facts appear on left */
+  #summary [data-pro-summary].is-expanded [data-pro-main] {
+    grid-column: 2;
+    max-width: none;
+    justify-self: stretch;
+    transform: translateX(18px);
+  }
+
+  #summary [data-pro-summary].is-expanded [data-pro-facts] {
+    grid-column: 1;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    max-height: 1000px;
+    overflow: visible;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+    border-color: var(--border);
+  }
+
+  #summary [data-pro-summary] [data-pro-main],
+  #summary [data-pro-summary] [data-pro-facts] {
+    transition:
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 700ms ease,
+      max-height 900ms ease,
+      padding 900ms ease,
+      border-color 700ms ease;
+  }
+}
+
+/* Mobile/tablet: always stacked and visible */
+@media (max-width: 920px) {
+  #summary [data-pro-summary] {
+    grid-template-columns: 1fr;
+  }
+
+  #summary [data-pro-summary] [data-pro-facts] {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.1rem !important;
+    border-color: var(--border) !important;
+  }
 }
 
 .panel {
@@ -591,6 +706,80 @@ spline-viewer.spline {
   border-radius: var(--radius);
   padding: 1.1rem;
   transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Neon hover aura (purple) — like the reference image */
+:is(.panel, .project-card, .expandable-card).glow-card,
+:is(.panel, .project-card, .expandable-card) {
+  position: relative;
+  isolation: isolate;
+}
+
+:is(.panel, .project-card, .expandable-card)::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 260ms ease, filter 260ms ease, transform 260ms ease;
+  /* Outer neon ring + soft aura */
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 70%, white),
+    0 0 22px 6px color-mix(in oklab, var(--glow-purple-neon) 35%, transparent),
+    0 0 60px 18px color-mix(in oklab, var(--glow-purple-2) 90%, transparent);
+  filter: blur(0px);
+  transform: translateZ(0);
+}
+
+:is(.panel, .project-card, .expandable-card).is-visible::after {
+  opacity: 1;
+}
+
+/* Featured Projects: NO outline glow */
+#projects :is(.panel, .project-card, .expandable-card)::after,
+#projects :is(.panel, .project-card, .expandable-card).is-visible::after {
+  opacity: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Experience: stronger glow when collapsed (scroll-driven via .is-visible) */
+.timeline.roadmap .t-item.panel.is-visible::after {
+  /* Reduce glow intensity for Experience cards */
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 40%, white),
+    0 0 14px 4px color-mix(in oklab, var(--glow-purple-neon) 18%, transparent),
+    0 0 34px 10px color-mix(in oklab, var(--glow-purple-2) 70%, transparent);
+}
+
+.timeline.roadmap.is-collapsed .t-item.panel.is-active.is-visible::after {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 52%, white),
+    0 0 18px 6px color-mix(in oklab, var(--glow-purple-neon) 24%, transparent),
+    0 0 46px 14px color-mix(in oklab, var(--glow-purple-2) 80%, transparent);
+}
+
+/* Skills section: no neon outline at all */
+#skills :is(.panel, .project-card, .expandable-card)::after,
+#skills :is(.panel, .project-card, .expandable-card).is-visible::after {
+  opacity: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Contact: add a subtle pink “dash” mixed into the outline */
+#contact :is(.panel, .project-card, .expandable-card)::after {
+  opacity: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Education: pink glow outline */
+#education :is(.panel, .project-card, .expandable-card).is-visible::after {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-pink) 70%, white),
+    0 0 18px 6px color-mix(in oklab, var(--glow-pink) 40%, transparent),
+    0 0 50px 18px color-mix(in oklab, var(--glow-pink-2) 90%, transparent);
 }
 
 .panel:hover {
@@ -647,23 +836,23 @@ spline-viewer.spline {
 }
 
 /* ----------
-   Scroll reveal animations
+   Scroll reveal animations (HUGE transitions)
    ---------- */
 [data-reveal] {
   opacity: 0;
-  transform: translateY(14px);
-  filter: blur(6px);
+  transform: translateY(80px) scale(0.92);
+  filter: blur(12px);
   transition:
-    opacity 520ms ease,
-    transform 520ms ease,
-    filter 520ms ease,
-    box-shadow 520ms ease;
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 800ms ease-out,
+    box-shadow 900ms ease;
   will-change: opacity, transform, filter;
 }
 
 [data-reveal].is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   filter: blur(0);
 }
 
@@ -676,13 +865,83 @@ spline-viewer.spline {
     0 0 26px var(--glow-purple-2);
 }
 
+/* Direction variants with bigger movement */
 [data-reveal="left"] {
-  transform: translateX(-14px);
+  transform: translateX(-120px) translateY(40px) scale(0.9) rotate(-3deg);
 }
 
 [data-reveal="right"] {
-  transform: translateX(14px);
+  transform: translateX(120px) translateY(40px) scale(0.9) rotate(3deg);
 }
+
+[data-reveal="left"].is-visible,
+[data-reveal="right"].is-visible {
+  transform: translateX(0) translateY(0) scale(1) rotate(0deg);
+}
+
+/* Section-specific dramatic reveals */
+#summary[data-reveal] {
+  transform: translateY(100px) scale(0.88);
+  filter: blur(16px);
+}
+
+#skills[data-reveal] {
+  transform: translateY(60px) rotateX(15deg);
+  transform-origin: center bottom;
+  filter: blur(10px);
+}
+
+#skills[data-reveal].is-visible {
+  transform: translateY(0) rotateX(0);
+}
+
+#experience[data-reveal] {
+  transform: translateY(90px) scale(0.9);
+  filter: blur(14px);
+}
+
+#education[data-reveal] {
+  transform: translateX(-80px) translateY(60px) scale(0.92);
+  filter: blur(12px);
+}
+
+#education[data-reveal].is-visible {
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+#projects[data-reveal] {
+  transform: translateY(120px) scale(0.85);
+  filter: blur(18px);
+}
+
+#hackathonwins[data-reveal] {
+  transform: translateX(80px) translateY(80px) scale(0.88);
+  filter: blur(14px);
+}
+
+#hackathonwins[data-reveal].is-visible {
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+#contact[data-reveal] {
+  transform: translateY(100px) scale(0.9) rotateX(8deg);
+  transform-origin: center top;
+  filter: blur(16px);
+}
+
+#contact[data-reveal].is-visible {
+  transform: translateY(0) scale(1) rotateX(0);
+}
+
+/* Staggered card reveals within sections */
+.grid [data-reveal]:nth-child(1) { transition-delay: 0ms; }
+.grid [data-reveal]:nth-child(2) { transition-delay: 150ms; }
+.grid [data-reveal]:nth-child(3) { transition-delay: 300ms; }
+.grid [data-reveal]:nth-child(4) { transition-delay: 450ms; }
+.grid [data-reveal]:nth-child(5) { transition-delay: 600ms; }
+.grid [data-reveal]:nth-child(6) { transition-delay: 750ms; }
+.grid [data-reveal]:nth-child(7) { transition-delay: 900ms; }
+.grid [data-reveal]:nth-child(8) { transition-delay: 1050ms; }
 
 [data-reveal="scale"] {
   transform: scale(0.98);
@@ -692,7 +951,14 @@ spline-viewer.spline {
   html {
     scroll-behavior: auto;
   }
-  [data-reveal] {
+  [data-reveal],
+  #summary[data-reveal],
+  #skills[data-reveal],
+  #experience[data-reveal],
+  #education[data-reveal],
+  #projects[data-reveal],
+  #hackathonwins[data-reveal],
+  #contact[data-reveal] {
     opacity: 1;
     transform: none;
     filter: none;
@@ -756,21 +1022,22 @@ spline-viewer.spline {
 
 .project-media img {
   width: 100%;
-  height: 190px;
+  height: clamp(180px, 32vw, 220px);
   object-fit: cover;
   display: block;
   background: #0b0b0b;
   transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 260ms ease;
 }
 
-.project-card:hover .project-media img {
-  transform: scale(1.03);
-  filter: brightness(1.04) saturate(1.05);
+.project-card:hover .project-media img,
+.project-card:hover .carousel-media {
+  transform: scale(1.05);
+  filter: brightness(1.08) saturate(1.1);
 }
 
 .project-placeholder {
   width: 100%;
-  height: 190px;
+  height: clamp(180px, 32vw, 220px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -834,15 +1101,96 @@ spline-viewer.spline {
 }
 
 .project-card:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-10px) scale(1.03);
   box-shadow: 
-    0 32px 80px rgba(0, 0, 0, 0.75),
-    0 0 40px var(--glow-purple-2);
-  border-color: color-mix(in oklab, var(--glow-purple) 60%, var(--border));
+    0 32px 80px rgba(0, 0, 0, 0.8),
+    0 0 50px var(--glow-purple-2),
+    0 0 80px var(--glow-purple),
+    inset 0 0 20px rgba(138, 43, 226, 0.05);
+  border-color: color-mix(in oklab, var(--glow-purple-neon) 70%, var(--border));
 }
 
 .project-card:hover::before {
-  opacity: 0.6;
+  opacity: 0.8;
+}
+
+.project-card:hover .project-title {
+  color: var(--glow-purple-neon);
+  text-shadow: 0 0 20px var(--glow-purple);
+}
+
+.project-card:hover .button {
+  border-color: color-mix(in oklab, var(--glow-purple-neon) 80%, var(--accent));
+  box-shadow: 0 0 15px var(--glow-purple-2);
+}
+
+/* ----------
+   Featured Projects: scroll-collapse left/right (desktop only)
+   ---------- */
+#projects.featured-projects .fp-break {
+  grid-column: 1 / -1;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+}
+
+/* Add generous spacing between project cards */
+#projects.featured-projects .grid.three.cards {
+  gap: 2.2rem;
+}
+
+@media (max-width: 920px) {
+  #projects.featured-projects .grid.three.cards {
+    gap: 1.6rem;
+  }
+}
+
+@media (min-width: 921px) {
+  #projects.featured-projects article.project-card {
+    transition:
+      transform 950ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 700ms ease,
+      box-shadow 340ms ease,
+      border-color 340ms ease,
+      background 340ms ease;
+  }
+
+  /* Collapsed: 2-column layout for wider cards */
+  #projects.featured-projects.is-collapsed .grid.three.cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.6rem;
+  }
+
+  #projects.featured-projects.is-collapsed article.project-card {
+    width: 100%;
+    opacity: 0.98;
+  }
+
+  /* Alternate left/right placement + subtle slide */
+  #projects.featured-projects.is-collapsed article.project-card:nth-of-type(odd) {
+    transform: translateX(-10px) scale(0.99);
+  }
+
+  #projects.featured-projects.is-collapsed article.project-card:nth-of-type(even) {
+    transform: translateX(10px) scale(0.99);
+  }
+
+  /* Keep hover lift but don't break alignment */
+  #projects.featured-projects.is-collapsed article.project-card:hover {
+    transform: translateY(-8px) scale(1.01);
+  }
+
+  /* Don't insert an empty "break" row in collapsed mode */
+  #projects.featured-projects.is-collapsed .fp-break {
+    display: none;
+  }
+}
+
+@media (max-width: 920px) {
+  #projects.featured-projects article.project-card {
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 
 .project-card h3 {
@@ -910,8 +1258,29 @@ spline-viewer.spline {
   display: block;
 }
 
+/* Keep icon as "+" (no X) */
 .expandable-card.is-expanded .expand-icon {
-  transform: rotate(45deg);
+  transform: none;
+}
+
+/* Hackathon wins: use 3-column layout */
+#hackathonwins .grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 920px) {
+  #hackathonwins .grid.three {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Hackathon wins: remove the toggle button (no X/close control) */
+#hackathonwins .expand-toggle {
+  display: none;
+}
+
+#hackathonwins .card-header {
+  justify-content: flex-start;
 }
 
 .card-details {
@@ -1012,6 +1381,13 @@ spline-viewer.spline {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 1.25rem;
   row-gap: 1.25rem;
+}
+
+/* Center the last item when there's an odd number of experience cards */
+.timeline.roadmap.is-expanded .t-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  max-width: 50%;
+  justify-self: center;
 }
 
 .timeline.roadmap::before {
@@ -1217,9 +1593,28 @@ spline-viewer.spline {
   padding-left: 5.2rem; /* space for node + meter */
 }
 
+/* Job Shadowing card - taller to match other cards */
+.timeline.roadmap .t-item.panel:nth-child(2) {
+  min-height: 220px;
+}
+
 @media (max-width: 920px) {
   .timeline.roadmap {
     grid-template-columns: 1fr;
+  }
+
+  .timeline.roadmap.is-expanded {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline.roadmap.is-expanded .t-item:last-child:nth-child(odd) {
+    grid-column: auto;
+    max-width: 100%;
+    justify-self: auto;
+  }
+
+  .timeline.roadmap .t-item.panel {
+    padding-left: 4.8rem;
   }
 }
 
@@ -1263,9 +1658,23 @@ spline-viewer.spline {
   will-change: transform;
 }
 
+.project-card > .carousel {
+  margin-top: 0;
+}
+
 .carousel-slide {
   min-width: 100%;
   border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+
+.carousel-media-link {
+  display: block;
+  text-decoration: none !important;
+}
+
+.carousel-media-link:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 70%, white);
+  outline-offset: 2px;
 }
 
 .carousel-slide .media-placeholder {
@@ -1274,10 +1683,17 @@ spline-viewer.spline {
 
 .carousel-media {
   width: 100%;
-  height: 200px;
+  height: clamp(200px, 34vw, 280px);
   display: block;
   object-fit: cover;
   background: #0b0b0b;
+  transition: transform 300ms ease, filter 300ms ease;
+}
+
+.carousel.fit-contain .carousel-media {
+  object-fit: contain;
+  background: #0b0b0b;
+  height: clamp(240px, 58vw, 440px);
 }
 
 /* Education: certifications carousel */
@@ -1469,10 +1885,12 @@ spline-viewer.spline {
   padding: 0.45rem 0.75rem;
   cursor: pointer;
   font-weight: 750;
+  transition: background 140ms ease, border-color 140ms ease;
 }
 
 .carousel-btn:hover {
   background: var(--panel-2);
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
 }
 
 .carousel-btn:focus-visible {
@@ -1519,27 +1937,35 @@ spline-viewer.spline {
   font-weight: 700;
   border-radius: 999px;
   padding: 0.7rem 1rem;
-  border: 1px solid var(--border);
-  background: var(--panel);
+  border: 2px solid color-mix(in oklab, var(--glow-purple-neon) 70%, var(--accent));
+  background: transparent;
   color: var(--text);
   text-decoration: none !important;
   cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 50%, transparent),
+    0 0 18px 4px color-mix(in oklab, var(--glow-purple-2) 65%, transparent),
+    0 0 36px 10px color-mix(in oklab, var(--glow-purple-2) 40%, transparent);
+  transition: transform 140ms ease, border-color 180ms ease, box-shadow 220ms ease;
 }
 
 .button:hover {
-  background: var(--panel-2);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
+  border-color: color-mix(in oklab, var(--glow-purple-neon) 85%, white);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 55%, white),
+    0 0 24px 8px color-mix(in oklab, var(--glow-purple-neon) 45%, transparent),
+    0 0 54px 16px color-mix(in oklab, var(--glow-purple-2) 70%, transparent);
 }
 
 .button.primary {
-  border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
-  background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 85%, white 0%), var(--accent-2));
-  color: #0b0d12;
+  border-color: color-mix(in oklab, var(--glow-purple-neon) 80%, var(--accent));
+  background: transparent;
+  color: var(--text);
 }
 
 .button.primary:hover {
-  filter: saturate(1.02);
+  filter: saturate(1.05);
 }
 
 .button.ghost {
@@ -1549,6 +1975,46 @@ spline-viewer.spline {
 .button.small {
   padding: 0.55rem 0.8rem;
   font-size: 0.95rem;
+}
+
+/* Prominent CTA for hackathon wins */
+.button.cta-wins {
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--glow-pink) 60%, var(--glow-purple-neon) 45%);
+  border-radius: 50px;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 30%, white),
+    0 0 26px 8px color-mix(in oklab, var(--glow-pink) 45%, transparent),
+    0 0 56px 18px color-mix(in oklab, var(--glow-purple-2) 95%, transparent);
+  animation: pulse-glow 2s ease-in-out infinite;
+  transition: all 300ms ease;
+}
+
+.button.cta-wins:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 40%, white),
+    0 0 34px 10px color-mix(in oklab, var(--glow-pink) 55%, transparent),
+    0 0 70px 24px color-mix(in oklab, var(--glow-purple-2) 100%, transparent);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 28%, white),
+      0 0 24px 7px color-mix(in oklab, var(--glow-pink) 40%, transparent),
+      0 0 50px 16px color-mix(in oklab, var(--glow-purple-2) 90%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 40%, white),
+      0 0 30px 9px color-mix(in oklab, var(--glow-pink) 52%, transparent),
+      0 0 64px 20px color-mix(in oklab, var(--glow-purple-2) 100%, transparent);
+  }
 }
 
 .button[aria-disabled="true"] {
@@ -1717,8 +2183,69 @@ textarea:focus-visible {
     height: 340px;
   }
 
+  .cert-carousel .carousel-media {
+    height: min(420px, 52vh);
+  }
+
   .footer-inner {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero {
+    padding: 3.2rem 0 1.6rem;
+  }
+
+  .fact {
+    grid-template-columns: 1fr;
+  }
+
+  .carousel-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .carousel-dots {
+    flex: 0 0 100%;
+    justify-content: center;
+    order: 3;
+  }
+
+  .timeline.roadmap .t-item.panel {
+    padding-left: 4.4rem;
+  }
+
+  .xp-node {
+    width: 56px;
+    height: 56px;
+    left: 14px;
+    top: 14px;
+  }
+
+  .xp-meter {
+    left: 44px;
+    top: 70px;
+    height: 72px;
+  }
+}
+
+@media (hover: none) {
+  .project-card:hover {
+    transform: none;
+  }
+
+  .project-card:hover::before {
+    opacity: 0.35;
+  }
+
+  .button.cta-wins:hover {
+    transform: none;
+  }
+
+  /* Still allow the purple neon ring on tap/focus (no heavy transforms) */
+  :is(.panel, .project-card, .expandable-card)::after {
+    transition: opacity 160ms ease;
   }
 }

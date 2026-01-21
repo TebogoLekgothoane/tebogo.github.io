@@ -15,6 +15,7 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="intro" id="intro" aria-label="Intro">
+        <img class="intro-profile" src="img/icons/me.png" alt="Tebogo Lekgothoane" />
         <div class="intro-card" role="status" aria-live="polite">
             <p class="intro-hello" data-text="Hello, I'm Tebogo Eveline Lekgothoane and welcome to my little corner of the web."></p>
         </div>
@@ -23,7 +24,7 @@
     <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="#top" aria-label="Home">
-                <span class="brand-mark" aria-hidden="true">TL</span>
+                <img class="brand-mark" src="img/icons/me.png" alt="" aria-hidden="true" />
                 <span class="brand-name">Tebogo Lekgothoane</span>
             </a>
 
@@ -67,7 +68,9 @@
                         <a class="pill pill-icon" href="https://github.com/TebogoLekgothoane" target="_blank" rel="noopener" aria-label="View GitHub profile">
                             <img src="img/icons/github.png" alt="GitHub" width="18" height="18" />
                         </a>
-                        <a class="pill" href="https://www.linkedin.com/in/tebogo-lekgothoane-122631353" target="_blank" rel="noopener" aria-label="View LinkedIn profile">LinkedIn</a>
+                        <a class="pill pill-icon" href="https://www.linkedin.com/in/tebogo-lekgothoane-122631353" target="_blank" rel="noopener" aria-label="View LinkedIn profile">
+                            <img src="img/icons/linkedin.png" alt="LinkedIn" width="18" height="18" />
+                        </a>
                     </div>
                 </div>
 
@@ -86,8 +89,8 @@
                     <p class="section-subhead">How I work, what I’m focused on, and the value I bring.</p>
                 </div>
 
-                <div class="grid two">
-                    <div class="panel" data-reveal="left">
+                <div class="grid two pro-summary is-collapsed" data-pro-summary>
+                    <div class="panel pro-main" data-pro-main data-reveal="left">
                         <p>
                             A driven junior developer with a Bachelor of Commerce (Information Systems) qualification completed (awaiting graduation), passionate about harnessing technology to solve real-world challenges in business and society.
                         </p>
@@ -96,7 +99,7 @@
                         </p>
                     </div>
 
-                    <div class="panel" data-reveal="right">
+                    <div class="panel pro-facts" data-pro-facts data-reveal="right">
                         <dl class="facts">
                             <div class="fact">
                                 <dt>Focus</dt>
@@ -159,7 +162,7 @@
                 </div>
 
                 <div class="timeline roadmap is-collapsed" data-experience>
-                    <article class="t-item panel is-active" style="--pct: 35%;" data-xp-item>
+                    <article class="t-item panel is-active" style="--pct: 35%;" data-xp-item data-reveal>
                         <button class="xp-node" type="button" aria-label="Toggle experience roadmap" aria-expanded="false"></button>
                         <div class="t-head">
                             <h3 class="panel-title">RCL General Representative — Kimberley Technical High School</h3>
@@ -172,7 +175,7 @@
                         </ul>
                     </article>
 
-                    <article class="t-item panel" style="--pct: 30%;" data-xp-item>
+                    <article class="t-item panel" style="--pct: 30%;" data-xp-item data-reveal>
                         <button class="xp-node" type="button" aria-label="Show this experience item" aria-expanded="false"></button>
                         <div class="t-head">
                             <h3 class="panel-title">Job Shadowing — Kimberley</h3>
@@ -184,7 +187,7 @@
                         </ul>
                     </article>
 
-                    <article class="t-item panel" style="--pct: 55%;" data-xp-item>
+                    <article class="t-item panel" style="--pct: 55%;" data-xp-item data-reveal>
                         <button class="xp-node" type="button" aria-label="Show this experience item" aria-expanded="false"></button>
                         <div class="t-head">
                             <h3 class="panel-title">Introduction to Programming Academic Tutor — University of Fort Hare</h3>
@@ -196,7 +199,7 @@
                         </ul>
                     </article>
 
-                    <article class="t-item panel" style="--pct: 40%;" data-xp-item>
+                    <article class="t-item panel" style="--pct: 40%;" data-xp-item data-reveal>
                         <button class="xp-node" type="button" aria-label="Show this experience item" aria-expanded="false"></button>
                         <div class="t-head">
                             <h3 class="panel-title">Hackathon Participant — Cortex Hub &amp; MICSETA</h3>
@@ -208,7 +211,7 @@
                         </ul>
                     </article>
 
-                    <article class="t-item panel" style="--pct: 100%;" data-xp-item>
+                    <article class="t-item panel" style="--pct: 100%;" data-xp-item data-reveal>
                         <button class="xp-node" type="button" aria-label="Show this experience item" aria-expanded="false"></button>
                         <div class="t-head">
                             <h3 class="panel-title">Junior Developer at Appimate — Internship</h3>
@@ -348,7 +351,7 @@
             </div>
         </section>
 
-        <section class="section" id="projects" data-reveal>
+        <section class="section featured-projects is-expanded" id="projects" data-reveal data-featured-projects>
             <div class="container">
                 <div class="section-head">
                     <h2>Featured Projects</h2>
@@ -357,15 +360,206 @@
 
                 <div class="grid three cards">
                     <article class="project-card" data-reveal>
+                        <div class="carousel" data-carousel aria-label="CraftSphere media slideshow">
+                            <div class="carousel-viewport">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/Craftsphere/Screenshot_20260121_195527.jpg" target="_blank" rel="noopener" aria-label="Open CraftSphere screenshot 1">
+                                            <img class="carousel-media" src="img/Craftsphere/Screenshot_20260121_195527.jpg" alt="CraftSphere screenshot 1" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/Craftsphere/Screenshot_20260121_200709.jpg" target="_blank" rel="noopener" aria-label="Open CraftSphere screenshot 2">
+                                            <img class="carousel-media" src="img/Craftsphere/Screenshot_20260121_200709.jpg" alt="CraftSphere screenshot 2" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/Craftsphere/Screenshot_20260121_200741.jpg" target="_blank" rel="noopener" aria-label="Open CraftSphere screenshot 3">
+                                            <img class="carousel-media" src="img/Craftsphere/Screenshot_20260121_200741.jpg" alt="CraftSphere screenshot 3" loading="lazy" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous slide">Prev</button>
+                                <div class="carousel-dots" role="tablist" aria-label="Slides"></div>
+                                <button class="carousel-btn" type="button" data-carousel-next aria-label="Next slide">Next</button>
+                            </div>
+                        </div>
+                        <div class="project-top">
+                            <h3>CraftSphere Web App</h3>
+                            <p class="muted">A platform connecting artisans and craft enthusiasts — enabling creators to showcase, sell, and share their handmade products.</p>
+                        </div>
+                        <ul class="tags" aria-label="Tech used">
+                            <li>ASP.NET WebForms</li><li>Bootstrap</li><li>JavaScript</li><li>SQL Server</li>
+                        </ul>
+                    </article>
+
+                    <article class="project-card" data-reveal>
+                        <div class="carousel" data-carousel aria-label="JoSearch media slideshow">
+                            <div class="carousel-viewport">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/JoSearch/Screenshot_20260121_195729_com.microsoft.office.officehubrow_edit_31273150218796.jpg" target="_blank" rel="noopener" aria-label="Open JoSearch screenshot 1">
+                                            <img class="carousel-media" src="img/JoSearch/Screenshot_20260121_195729_com.microsoft.office.officehubrow_edit_31273150218796.jpg" alt="JoSearch screenshot 1" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/JoSearch/Screenshot_20260121_195753_com.microsoft.office.officehubrow_edit_31334448461325.jpg" target="_blank" rel="noopener" aria-label="Open JoSearch screenshot 2">
+                                            <img class="carousel-media" src="img/JoSearch/Screenshot_20260121_195753_com.microsoft.office.officehubrow_edit_31334448461325.jpg" alt="JoSearch screenshot 2" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/JoSearch/Screenshot_20260121_195859.jpg" target="_blank" rel="noopener" aria-label="Open JoSearch screenshot 3">
+                                            <img class="carousel-media" src="img/JoSearch/Screenshot_20260121_195859.jpg" alt="JoSearch screenshot 3" loading="lazy" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous slide">Prev</button>
+                                <div class="carousel-dots" role="tablist" aria-label="Slides"></div>
+                                <button class="carousel-btn" type="button" data-carousel-next aria-label="Next slide">Next</button>
+                            </div>
+                        </div>
+                        <div class="project-top">
+                            <h3>JoSearch Web App</h3>
+                            <p class="muted">A job search aggregator that simplifies finding employment — consolidating listings from multiple sources into one streamlined interface.</p>
+                        </div>
+                        <ul class="tags" aria-label="Tech used">
+                            <li>ASP.NET WebForms</li><li>Bootstrap</li><li>JavaScript</li><li>MicrosoftSQL Server</li>
+                        </ul>
+                    </article>
+
+                    <article class="project-card" data-reveal>
+                        <div class="carousel" data-carousel aria-label="TastyTech Delivery App media slideshow">
+                            <div class="carousel-viewport">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TastyTech/Videoframe_20260121_181135_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TastyTech screenshot 1">
+                                            <img class="carousel-media" src="img/TastyTech/Videoframe_20260121_181135_com.huawei.himovie.overseas.jpg" alt="TastyTech Delivery App screenshot 1" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TastyTech/Videoframe_20260121_181245_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TastyTech screenshot 2">
+                                            <img class="carousel-media" src="img/TastyTech/Videoframe_20260121_181245_com.huawei.himovie.overseas.jpg" alt="TastyTech Delivery App screenshot 2" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TastyTech/Videoframe_20260121_181336_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TastyTech screenshot 3">
+                                            <img class="carousel-media" src="img/TastyTech/Videoframe_20260121_181336_com.huawei.himovie.overseas.jpg" alt="TastyTech Delivery App screenshot 3" loading="lazy" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous slide">Prev</button>
+                                <div class="carousel-dots" role="tablist" aria-label="Slides"></div>
+                                <button class="carousel-btn" type="button" data-carousel-next aria-label="Next slide">Next</button>
+                            </div>
+                        </div>
+                        <div class="project-top">
+                            <h3>TastyTech Delivery Web App</h3>
+                            <p class="muted">A food delivery application connecting hungry customers with local restaurants — featuring real-time order tracking and seamless payments.</p>
+                        </div>
+                        <ul class="tags" aria-label="Tech used">
+                            <li>C# WinForms</li><li>Windows Forms</li><li>SQL Server</li>
+                        </ul>
+                    </article>
+
+                    <div class="fp-break" data-fp-break aria-hidden="true"></div>
+
+                    <article class="project-card" data-reveal>
                         <div class="project-media">
                             <img src="img/Featured%20Projects/the%20voice%20lounge.png" alt="Voice Lounge app preview" loading="lazy" />
                         </div>
                         <div class="project-top">
-                            <h3>Voice Lounge</h3>
+                            <h3>Voice Lounge Mobile App</h3>
                             <p class="muted">Developed as a software trainee at Appimate — a voice-based social platform enabling real-time audio interactions and community engagement.</p>
                         </div>
                         <ul class="tags" aria-label="Tech used">
                             <li>React Native</li><li>Real-time audio</li><li>Social features</li>
+                        </ul>
+                    </article>
+
+                    <article class="project-card" data-reveal>
+                        <div class="carousel fit-contain" data-carousel aria-label="TelkomX Troubleshooter media slideshow">
+                            <div class="carousel-viewport">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TelkomX%20Troubleshooter/Videoframe_20260121_202700_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TelkomX Troubleshooter screenshot 1">
+                                            <img class="carousel-media" src="img/TelkomX%20Troubleshooter/Videoframe_20260121_202700_com.huawei.himovie.overseas.jpg" alt="TelkomX Troubleshooter screenshot 1" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TelkomX%20Troubleshooter/Videoframe_20260121_202716_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TelkomX Troubleshooter screenshot 2">
+                                            <img class="carousel-media" src="img/TelkomX%20Troubleshooter/Videoframe_20260121_202716_com.huawei.himovie.overseas.jpg" alt="TelkomX Troubleshooter screenshot 2" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TelkomX%20Troubleshooter/Videoframe_20260121_202721_com.huawei.himovie.overseas_edit_32824231260965.jpg" target="_blank" rel="noopener" aria-label="Open TelkomX Troubleshooter screenshot 3">
+                                            <img class="carousel-media" src="img/TelkomX%20Troubleshooter/Videoframe_20260121_202721_com.huawei.himovie.overseas_edit_32824231260965.jpg" alt="TelkomX Troubleshooter screenshot 3" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/TelkomX%20Troubleshooter/Videoframe_20260121_202752_com.huawei.himovie.overseas.jpg" target="_blank" rel="noopener" aria-label="Open TelkomX Troubleshooter screenshot 4">
+                                            <img class="carousel-media" src="img/TelkomX%20Troubleshooter/Videoframe_20260121_202752_com.huawei.himovie.overseas.jpg" alt="TelkomX Troubleshooter screenshot 4" loading="lazy" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous slide">Prev</button>
+                                <div class="carousel-dots" role="tablist" aria-label="Slides"></div>
+                                <button class="carousel-btn" type="button" data-carousel-next aria-label="Next slide">Next</button>
+                            </div>
+                        </div>
+                        <div class="project-top">
+                            <h3>TelkomX Troubleshooter Mobile App</h3>
+                            <p class="muted">A smart mobile app for Telkom customers — featuring predictive support queue, AI assistant, community forum, and real-time network updates.</p>
+                        </div>
+                        <ul class="tags" aria-label="Tech used">
+                            <li>React Native</li><li>AI Assistant</li><li>Predictive Queue</li><li>Community Forum</li>
+                        </ul>
+                    </article>
+                    <article class="project-card" data-reveal>
+                        <div class="carousel fit-contain" data-carousel aria-label="NimbleBlock media slideshow">
+                            <div class="carousel-viewport">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/NimbleBlocks/Screenshot_20251022_201618_com.companyname.nimbleblocks.jpg" target="_blank" rel="noopener" aria-label="Open NimbleBlock screenshot 1">
+                                            <img class="carousel-media" src="img/NimbleBlocks/Screenshot_20251022_201618_com.companyname.nimbleblocks.jpg" alt="NimbleBlock screenshot 1" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/NimbleBlocks/Screenshot_20251022_201643_com.companyname.nimbleblocks.jpg" target="_blank" rel="noopener" aria-label="Open NimbleBlock screenshot 2">
+                                            <img class="carousel-media" src="img/NimbleBlocks/Screenshot_20251022_201643_com.companyname.nimbleblocks.jpg" alt="NimbleBlock screenshot 2" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/NimbleBlocks/Screenshot_20251022_201728_com.companyname.nimbleblocks.jpg" target="_blank" rel="noopener" aria-label="Open NimbleBlock screenshot 3">
+                                            <img class="carousel-media" src="img/NimbleBlocks/Screenshot_20251022_201728_com.companyname.nimbleblocks.jpg" alt="NimbleBlock screenshot 3" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <a class="carousel-media-link" href="img/NimbleBlocks/Screenshot_20251022_201739_com.companyname.nimbleblocks.jpg" target="_blank" rel="noopener" aria-label="Open NimbleBlock screenshot 4">
+                                            <img class="carousel-media" src="img/NimbleBlocks/Screenshot_20251022_201739_com.companyname.nimbleblocks.jpg" alt="NimbleBlock screenshot 4" loading="lazy" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" type="button" data-carousel-prev aria-label="Previous slide">Prev</button>
+                                <div class="carousel-dots" role="tablist" aria-label="Slides"></div>
+                                <button class="carousel-btn" type="button" data-carousel-next aria-label="Next slide">Next</button>
+                            </div>
+                        </div>
+                        <div class="project-top">
+                            <h3>NimbleBlock Mobile App</h3>
+                            <p class="muted">A mobile implementation of the classic Nim strategy game — challenge your logic and outsmart your opponent by removing blocks strategically.</p>
+                        </div>
+                        <ul class="tags" aria-label="Tech used">
+                            <li>Xamarin Forms</li><li>C#</li><li>Mobile App</li>
                         </ul>
                     </article>
 
@@ -379,103 +573,11 @@
                         </ul>
                     </article>
 
-                    <article class="project-card" data-reveal>
-                        <div class="project-top">
-                            <h3>Hackathon Portfolio</h3>
-                            <p class="muted">Award-winning solutions from multiple hackathons — Telkom 10x (2nd Place), ELIDZ-STP (1st Place), and W&RSETA (1st Place).</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>React Native</li><li>Rapid prototyping</li><li>Team delivery</li>
-                        </ul>
-                        <div class="project-links">
-                            <a class="button small" href="#hackathonwins" data-show-hackathonwins>See wins</a>
-                        </div>
-                    </article>
-
-                    <article class="project-card" data-reveal>
-                        <div class="project-media">
-                            <!-- Placeholder for CraftSphere image -->
-                            <div class="project-placeholder" aria-label="CraftSphere preview placeholder">
-                                <span>CraftSphere Preview</span>
-                            </div>
-                        </div>
-                        <div class="project-top">
-                            <h3>CraftSphere</h3>
-                            <p class="muted">A platform connecting artisans and craft enthusiasts — enabling creators to showcase, sell, and share their handmade products.</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>ASP.NET WebForms</li><li>Bootstrap</li><li>JavaScript</li><li>SQL Server</li>
-                        </ul>
-                    </article>
-
-                    <article class="project-card" data-reveal>
-                        <div class="project-media">
-                            <!-- Placeholder for JoSearch image -->
-                            <div class="project-placeholder" aria-label="JoSearch preview placeholder">
-                                <span>JoSearch Preview</span>
-                            </div>
-                        </div>
-                        <div class="project-top">
-                            <h3>JoSearch</h3>
-                            <p class="muted">A job search aggregator that simplifies finding employment — consolidating listings from multiple sources into one streamlined interface.</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>ASP.NET WebForms</li><li>Bootstrap</li><li>JavaScript</li><li>MicrosoftSQL Server</li>
-                        </ul>
-                    </article>
-
-                    <article class="project-card" data-reveal>
-                        <div class="project-media">
-                            <!-- Placeholder for TastyDelivery image -->
-                            <div class="project-placeholder" aria-label="TastyDelivery preview placeholder">
-                                <span>TastyTech Delivery App Preview</span>
-                            </div>
-                        </div>
-                        <div class="project-top">
-                            <h3>TastyTech Delivery App</h3>
-                            <p class="muted">A food delivery application connecting hungry customers with local restaurants — featuring real-time order tracking and seamless payments.</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>C# WinForms</li><li>Windows Forms</li><li>SQL Server</li>
-                        </ul>
-                    </article>
-
-                    <article class="project-card" data-reveal>
-                        <div class="project-media">
-                            <!-- Placeholder for NimbleBlock image -->
-                            <div class="project-placeholder" aria-label="NimbleBlock preview placeholder">
-                                <span>NimbleBlock Preview</span>
-                            </div>
-                        </div>
-                        <div class="project-top">
-                            <h3>NimbleBlock</h3>
-                            <p class="muted">A mobile implementation of the classic Nim strategy game — challenge your logic and outsmart your opponent by removing blocks strategically.</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>Xamarin Forms</li><li>C#</li><li>Mobile App</li>
-                        </ul>
-                    </article>
-
-                    <article class="project-card" data-reveal>
-                        <div class="project-media">
-                            <!-- Placeholder for TelkomX Troubleshooter image -->
-                            <div class="project-placeholder" aria-label="TelkomX Troubleshooter preview placeholder">
-                                <span>TelkomX Troubleshooter Preview</span>
-                            </div>
-                        </div>
-                        <div class="project-top">
-                            <h3>TelkomX Troubleshooter</h3>
-                            <p class="muted">A smart mobile app for Telkom customers — featuring predictive support queue, AI assistant, community forum, and real-time network updates.</p>
-                        </div>
-                        <ul class="tags" aria-label="Tech used">
-                            <li>React Native</li><li>AI Assistant</li><li>Predictive Queue</li><li>Community Forum</li>
-                        </ul>
-                    </article>
                 </div>
             </div>
         </section>
 
-        <section class="section" id="hackathonwins" data-reveal hidden>
+        <section class="section" id="hackathonwins" data-reveal>
             <div class="container">
                 <div class="section-head">
                     <h2>Hackathon Wins</h2>
@@ -623,7 +725,7 @@
                 </div>
 
                 <div class="grid two">
-                    <div class="panel">
+                    <div class="panel" data-reveal="left">
                         <h3 class="panel-title">Get in touch</h3>
                         <p class="muted">Fastest ways to reach me:</p>
                         <p>
@@ -646,7 +748,7 @@
                         </p>
                     </div>
 
-                    <form class="panel contact-form" id="contact-form">
+                    <form class="panel contact-form" id="contact-form" data-reveal="right">
                         <h3 class="panel-title">Quick message</h3>
                         <label>
                             <span>Name</span>
