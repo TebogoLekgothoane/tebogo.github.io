@@ -106,6 +106,45 @@
       if (isStaggered) el.style.transitionDelay = `${Math.min(i * 55, 320)}ms`;
       io.observe(el);
     });
+
+    // Safety net: some browsers/viewports occasionally miss IntersectionObserver callbacks.
+    // If a section stays blurred (no .is-visible), force-reveal it when it enters view.
+    let raf = 0;
+    let pending = revealEls.filter((el) => el instanceof HTMLElement);
+
+    const revealByScroll = () => {
+      const vh = window.innerHeight || 0;
+      // Reveal when the element enters the main viewport band
+      const topBand = vh * 0.92;
+      const bottomBand = vh * 0.08;
+
+      pending.forEach((el) => {
+        if (!(el instanceof HTMLElement)) return;
+        if (el.classList.contains("is-visible")) return;
+        const r = el.getBoundingClientRect();
+        if (r.top < topBand && r.bottom > bottomBand) el.classList.add("is-visible");
+      });
+
+      pending = pending.filter((el) => el instanceof HTMLElement && !el.classList.contains("is-visible"));
+      if (!pending.length) {
+        window.removeEventListener("scroll", onScroll, { passive: true });
+        window.removeEventListener("resize", onScroll, { passive: true });
+      }
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        revealByScroll();
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    // Run once after paint + once after fonts/layout settle
+    requestAnimationFrame(revealByScroll);
+    window.setTimeout(revealByScroll, 800);
   } else {
     // Fallback: just show everything
     revealEls.forEach((el) => el.classList.add("is-visible"));

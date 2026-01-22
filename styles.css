@@ -544,6 +544,36 @@ strong {
   transform-origin: center center;
 }
 
+/* Medium laptops (common 1024–1366 widths): reduce Spline dominance */
+@media (max-width: 1150px) and (min-width: 921px) {
+  .hero-inner {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 1.1rem;
+  }
+
+  .spline-wrap {
+    /* Prevent the hero visual from taking over shorter laptop viewports */
+    height: clamp(420px, calc(100vh - 180px), 620px);
+    min-height: 420px;
+  }
+
+  .spline-wrap spline-viewer {
+    transform: scale(1.65);
+  }
+}
+
+/* Short-height laptops (e.g. 1366×768): keep hero compact */
+@media (max-height: 760px) and (min-width: 921px) {
+  .hero {
+    padding: 3.2rem 0 1.8rem;
+  }
+
+  .spline-wrap {
+    height: clamp(380px, calc(100vh - 220px), 560px);
+    min-height: 380px;
+  }
+}
+
 .card-top {
   display: flex;
   align-items: center;
