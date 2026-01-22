@@ -544,62 +544,6 @@ strong {
   transform-origin: center center;
 }
 
-.viewport-edge-runner {
-  /* On top of the page, doesn't block clicks */
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1500; /* below intro (2000), above content */
-}
-
-.viewport-edge-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.viewport-edge-base,
-.viewport-edge-dash {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: miter;
-  stroke-linecap: butt;
-}
-
-.viewport-edge-base {
-  stroke: color-mix(in oklab, var(--glow-purple-neon) 28%, transparent);
-  stroke-width: 2.2;
-  opacity: 0.85;
-  filter:
-    drop-shadow(0 0 6px color-mix(in oklab, var(--glow-purple-neon) 38%, transparent))
-    drop-shadow(0 0 14px color-mix(in oklab, var(--glow-purple-2) 85%, transparent));
-}
-
-.viewport-edge-dash {
-  stroke: color-mix(in oklab, var(--glow-purple-neon) 82%, white);
-  stroke-width: 3;
-  stroke-dasharray: 14 86; /* one “runner” segment */
-  animation: viewportEdgeRun 2.2s linear infinite;
-  filter:
-    drop-shadow(0 0 5px color-mix(in oklab, var(--glow-purple-neon) 68%, transparent))
-    drop-shadow(0 0 12px color-mix(in oklab, var(--glow-purple-2) 85%, transparent));
-}
-
-@keyframes viewportEdgeRun {
-  to {
-    stroke-dashoffset: -100;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .viewport-edge-dash {
-    animation: none !important;
-    stroke-dasharray: none;
-  }
-}
-
 .card-top {
   display: flex;
   align-items: center;
