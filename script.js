@@ -270,6 +270,147 @@
     });
   }
 
+  // Skills: auto-expand on scroll into section; auto-collapse when scrolling away
+  const skillsSection = document.getElementById("skills");
+  const skillsContent = document.querySelector("#skills [data-skills-content]");
+
+  if (
+    skillsSection instanceof HTMLElement &&
+    skillsContent instanceof HTMLElement &&
+    "IntersectionObserver" in window
+  ) {
+    let endTimer = 0;
+    let isExpanded = false;
+
+    // Track scroll direction
+    let lastScrollY = window.scrollY;
+    let scrollDirection = "down";
+    window.addEventListener(
+      "scroll",
+      () => {
+        const y = window.scrollY;
+        scrollDirection = y < lastScrollY ? "up" : "down";
+        lastScrollY = y;
+      },
+      { passive: true }
+    );
+
+    const setExpanded = (expanded) => {
+      if (expanded === isExpanded) return;
+      isExpanded = expanded;
+
+      // Reduced motion: no animation, just show/hide
+      if (prefersReducedMotion) {
+        skillsContent.classList.toggle("is-open", expanded);
+        skillsContent.style.maxHeight = "";
+        skillsContent.hidden = !expanded;
+        return;
+      }
+
+      // Clear any pending "hide after transition"
+      if (endTimer) window.clearTimeout(endTimer);
+      endTimer = 0;
+
+      if (expanded) {
+        skillsContent.hidden = false;
+        skillsContent.classList.add("is-open");
+        // Animate open to the content height, then remove the max-height cap
+        skillsContent.style.maxHeight = "0px";
+        requestAnimationFrame(() => {
+          const h = skillsContent.scrollHeight;
+          skillsContent.style.maxHeight = `${h}px`;
+
+          // Some layouts (grid wrapping/fonts) settle a moment later; re-sync once.
+          window.setTimeout(() => {
+            if (!isExpanded) return;
+            skillsContent.style.maxHeight = `${skillsContent.scrollHeight}px`;
+          }, 60);
+
+          // After the transition finishes, allow natural height so nothing is clipped.
+          window.setTimeout(() => {
+            if (!isExpanded) return;
+            skillsContent.style.maxHeight = "none";
+          }, 560);
+        });
+      } else {
+        // If we removed the max-height cap while open, restore a concrete height first
+        skillsContent.style.maxHeight = `${skillsContent.scrollHeight}px`;
+        requestAnimationFrame(() => {
+          skillsContent.classList.remove("is-open");
+          skillsContent.style.maxHeight = "0px";
+        });
+
+        const onEnd = (e) => {
+          if (!(e instanceof TransitionEvent)) return;
+          if (e.target !== skillsContent) return;
+          if (e.propertyName !== "max-height") return;
+          skillsContent.removeEventListener("transitionend", onEnd);
+          skillsContent.hidden = true;
+          skillsContent.style.maxHeight = "";
+        };
+        skillsContent.addEventListener("transitionend", onEnd);
+        endTimer = window.setTimeout(() => {
+          skillsContent.removeEventListener("transitionend", onEnd);
+          skillsContent.hidden = true;
+          skillsContent.style.maxHeight = "";
+        }, 650);
+      }
+    };
+
+    // Initial state (collapsed)
+    setExpanded(false);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Expand as soon as ANY part of the Skills section enters the viewport.
+          if (entry.isIntersecting) {
+            setExpanded(true);
+            return;
+          }
+
+          // Collapse only when the user scrolls up away from Skills (not when scrolling down).
+          if (scrollDirection === "up") setExpanded(false);
+        });
+      },
+      { root: null, rootMargin: "0px", threshold: 0 }
+    );
+
+    io.observe(skillsSection);
+
+    // Fallback/assist: also drive it from scroll position (more reliable than IO alone on some layouts)
+    const isSkillsInView = () => {
+      const r = skillsSection.getBoundingClientRect();
+      const vh = window.innerHeight || 0;
+      // Consider it "in view" when the section is in the middle band of the viewport
+      return r.top < vh * 0.75 && r.bottom > vh * 0.25;
+    };
+
+    const syncByScroll = () => {
+      if (isSkillsInView()) {
+        setExpanded(true);
+      } else if (scrollDirection === "up") {
+        setExpanded(false);
+      }
+    };
+
+    window.addEventListener("scroll", syncByScroll, { passive: true });
+    // Run once after initial paint
+    requestAnimationFrame(syncByScroll);
+
+    // Keep height accurate if the viewport changes while expanded
+    window.addEventListener(
+      "resize",
+      () => {
+        if (!isExpanded) return;
+        if (prefersReducedMotion) return;
+        // If open, keep it unconstrained so the grid can reflow freely
+        skillsContent.style.maxHeight = "none";
+      },
+      { passive: true }
+    );
+  }
+
   // Hackathon wins section: hidden by default, reveal on demand
   const hackathonSection = document.getElementById("hackathonwins");
 
@@ -585,8 +726,9 @@
 
     setIndex(0);
 
-    // Autoplay slideshow (paused on hover/focus; pauses while a video plays)
-    const autoplayEnabled = !prefersReducedMotion;
+    // Autoplay slideshow (pauses while a video plays)
+    // User preference: make ALL carousels auto-advance (don't pause on hover).
+    const autoplayEnabled = slides.length > 1;
     const intervalMs = carousel.classList.contains("cert-carousel") ? 5200 : 4200;
     let timer = 0;
 
@@ -616,8 +758,7 @@
       startAutoplay();
     };
 
-    carousel.addEventListener("mouseenter", stopAutoplay);
-    carousel.addEventListener("mouseleave", startAutoplay);
+    // Pause autoplay only for keyboard focus (so users can interact with controls)
     carousel.addEventListener("focusin", stopAutoplay);
     carousel.addEventListener("focusout", startAutoplay);
 

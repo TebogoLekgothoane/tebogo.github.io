@@ -8,7 +8,7 @@
     <meta name="color-scheme" content="dark" />
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:," />
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.38/build/spline-viewer.js"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.39/build/spline-viewer.js"></script>
 </head>
 <body class="is-intro">
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
@@ -76,7 +76,7 @@
 
                 <div class="hero-card" role="presentation">
                     <div class="spline-wrap" aria-label="3D scene">
-                        <spline-viewer class="spline" url="https://prod.spline.design/d03B-Dux7bN6W5kE/scene.splinecode"></spline-viewer>
+                        <spline-viewer url="https://prod.spline.design/7zG5FtGTcXvt7qpr/scene.splinecode"></spline-viewer>
                     </div>
                 </div>
             </div>
@@ -126,29 +126,68 @@
                     <p class="section-subhead">Languages, tools, and core strengths.</p>
                 </div>
 
-                <div class="grid two">
-                    <div class="panel" data-reveal="left">
-                        <h3 class="panel-title">Languages &amp; tools</h3>
-                        <ul class="checklist">
-                            <li>C#.NET</li>
-                            <li>HTML, CSS, ASP.NET, Bootstrap</li>
-                            <li>Microsoft SQL Server</li>
-                            <li>Typescript (basic)</li>
-                            <li>Next.js (Fundamentals)</li>
+                <div class="skills-grid">
+                    <div class="skills-card" data-reveal="left" data-skills-shell>
+                        <h3 class="panel-title">Skills</h3>
+
+                        <!-- Collapsed view: show a few skills only -->
+                        <ul class="tags" aria-label="Skills preview">
+                            <li>C#/.NET</li>
+                            <li>ASP.NET</li>
+                            <li>SQL Server</li>
+                            <li>JavaScript</li>
+                            <li>HTML</li>
+                            <li>CSS</li>
                             <li>React Native</li>
                             <li>Supabase</li>
-                            <li>Tailwind CSS</li>
-                            <li>GitHub</li>
                         </ul>
-                    </div>
-                    <div class="panel" data-reveal="right">
-                        <h3 class="panel-title">Core skills</h3>
-                        <ul class="checklist">
-                            <li>User interface design</li>
+
+                        <h4 class="skills-group-title">Core strengths</h4>
+                        <ul class="tags" aria-label="Core strengths">
+                            <li>UI design</li>
                             <li>Problem-solving</li>
-                            <li>Teamwork &amp; collaboration</li>
+                            <li>Teamwork</li>
                             <li>Communication</li>
                         </ul>
+
+                        <!-- Auto-expanded on scroll into the section -->
+                        <div class="skills-collapsible" data-skills-content hidden>
+                            <div class="skills-collapsible-inner">
+                                <div class="skills-groups" aria-label="Full skill set">
+                                    <div class="skills-group">
+                                        <h4 class="skills-group-title">Languages</h4>
+                                        <ul class="tags">
+                                            <li>C#</li>
+                                            <li>TypeScript (basic)</li>
+                                            <li>JavaScript</li>
+                                            <li>SQL</li>
+                                            <li>HTML</li>
+                                            <li>CSS</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="skills-group">
+                                        <h4 class="skills-group-title">Frameworks &amp; UI</h4>
+                                        <ul class="tags">
+                                            <li>ASP.NET</li>
+                                            <li>Bootstrap</li>
+                                            <li>Next.js (fundamentals)</li>
+                                            <li>React Native</li>
+                                            <li>Tailwind CSS</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="skills-group">
+                                        <h4 class="skills-group-title">Data &amp; tooling</h4>
+                                        <ul class="tags">
+                                            <li>Microsoft SQL Server</li>
+                                            <li>Supabase</li>
+                                            <li>GitHub</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

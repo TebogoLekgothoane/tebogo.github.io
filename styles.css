@@ -535,11 +535,12 @@ strong {
   }
 }
 
-spline-viewer.spline {
+.spline-wrap spline-viewer {
   width: 100%;
   height: 100%;
   display: block;
-  transform: scale(1.8);
+  /* Slight zoom-in for the hero 3D scene */
+  transform: scale(1.92);
   transform-origin: center center;
 }
 
@@ -766,6 +767,126 @@ spline-viewer.spline {
 #skills :is(.panel, .project-card, .expandable-card).is-visible::after {
   opacity: 0 !important;
   box-shadow: none !important;
+}
+
+/* ----------
+   Skills: sophisticated collapsible layout
+   ---------- */
+#skills .skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+#skills .skills-card {
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  position: relative;
+  isolation: isolate;
+}
+
+#skills .skills-card::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 70%, white),
+    0 0 22px 6px color-mix(in oklab, var(--glow-purple-neon) 35%, transparent),
+    0 0 60px 18px color-mix(in oklab, var(--glow-purple-2) 90%, transparent);
+}
+
+#skills .skills-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.6);
+  border-color: color-mix(in oklab, var(--glow-purple) 35%, var(--border));
+}
+
+#skills .skills-card:hover::after {
+  opacity: 1;
+}
+
+#skills .skills-card .tags {
+  margin-top: 0.75rem;
+}
+
+#skills .skills-collapsible {
+  margin-top: 1rem;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    max-height 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: max-height, opacity, transform;
+}
+
+#skills .skills-collapsible.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#skills .skills-collapsible-inner {
+  background: color-mix(in oklab, var(--panel) 90%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  position: relative;
+  isolation: isolate;
+}
+
+#skills .skills-collapsible-inner::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow-purple-neon) 70%, white),
+    0 0 22px 6px color-mix(in oklab, var(--glow-purple-neon) 35%, transparent),
+    0 0 60px 18px color-mix(in oklab, var(--glow-purple-2) 90%, transparent);
+}
+
+#skills .skills-collapsible-inner:hover::after {
+  opacity: 1;
+}
+
+#skills .skills-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 920px) {
+  #skills .skills-groups {
+    grid-template-columns: 1fr;
+  }
+}
+
+#skills .skills-group-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: color-mix(in oklab, var(--text) 90%, white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #skills .skills-card,
+  #skills .skills-collapsible {
+    transition: none !important;
+  }
 }
 
 /* Contact: add a subtle pink “dash” mixed into the outline */
@@ -1146,6 +1267,11 @@ spline-viewer.spline {
 }
 
 @media (min-width: 921px) {
+  /* Expanded: 3-column layout (projects section) */
+  #projects.featured-projects.is-expanded .grid.three.cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   #projects.featured-projects article.project-card {
     transition:
       transform 950ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -1155,9 +1281,9 @@ spline-viewer.spline {
       background 340ms ease;
   }
 
-  /* Collapsed: 2-column layout for wider cards */
+  /* Collapsed: keep 3-column layout (requested) */
   #projects.featured-projects.is-collapsed .grid.three.cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2.6rem;
   }
 
