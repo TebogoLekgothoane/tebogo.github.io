@@ -1030,13 +1030,13 @@ strong {
   transform: translateX(0) translateY(0) scale(1) rotate(0deg);
 }
 
-/* Section-specific dramatic reveals */
-#summary[data-reveal] {
+/* Section-specific dramatic reveals (ONLY before they become visible) */
+#summary[data-reveal]:not(.is-visible) {
   transform: translateY(100px) scale(0.88);
   filter: blur(16px);
 }
 
-#skills[data-reveal] {
+#skills[data-reveal]:not(.is-visible) {
   transform: translateY(60px) rotateX(15deg);
   transform-origin: center bottom;
   filter: blur(10px);
@@ -1046,12 +1046,12 @@ strong {
   transform: translateY(0) rotateX(0);
 }
 
-#experience[data-reveal] {
+#experience[data-reveal]:not(.is-visible) {
   transform: translateY(90px) scale(0.9);
   filter: blur(14px);
 }
 
-#education[data-reveal] {
+#education[data-reveal]:not(.is-visible) {
   transform: translateX(-80px) translateY(60px) scale(0.92);
   filter: blur(12px);
 }
@@ -1060,12 +1060,12 @@ strong {
   transform: translateX(0) translateY(0) scale(1);
 }
 
-#projects[data-reveal] {
+#projects[data-reveal]:not(.is-visible) {
   transform: translateY(120px) scale(0.85);
   filter: blur(18px);
 }
 
-#hackathonwins[data-reveal] {
+#hackathonwins[data-reveal]:not(.is-visible) {
   transform: translateX(80px) translateY(80px) scale(0.88);
   filter: blur(14px);
 }
@@ -1074,7 +1074,7 @@ strong {
   transform: translateX(0) translateY(0) scale(1);
 }
 
-#contact[data-reveal] {
+#contact[data-reveal]:not(.is-visible) {
   transform: translateY(100px) scale(0.9) rotateX(8deg);
   transform-origin: center top;
   filter: blur(16px);
