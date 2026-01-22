@@ -2307,6 +2307,12 @@ textarea:focus-visible {
 
   .spline-wrap {
     height: 340px;
+    min-height: 340px; /* override desktop min-height: 500px */
+  }
+
+  .spline-wrap spline-viewer {
+    /* Less zoom on small screens */
+    transform: scale(1.45);
   }
 
   .cert-carousel .carousel-media {
