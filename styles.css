@@ -1299,7 +1299,7 @@ strong {
 @media (min-width: 921px) {
   /* Expanded: 3-column layout (projects section) */
   #projects.featured-projects.is-expanded .grid.three.cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #projects.featured-projects article.project-card {
@@ -1313,8 +1313,8 @@ strong {
 
   /* Collapsed: keep 3-column layout (requested) */
   #projects.featured-projects.is-collapsed .grid.three.cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.4rem;
   }
 
   #projects.featured-projects.is-collapsed article.project-card {
