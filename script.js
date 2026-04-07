@@ -3,86 +3,17 @@
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  // Intro overlay (short greeting, then reveal site)
-  const intro = document.getElementById("intro");
-  const introSkip = intro?.querySelector(".intro-skip");
-  const introHello = intro?.querySelector(".intro-hello");
-
   const prefersReducedMotion =
     window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const finishIntro = () => {
-    document.body.classList.remove("is-intro");
-    if (intro instanceof HTMLElement) {
-      intro.classList.add("is-leaving");
-      // remove after fade
-      window.setTimeout(() => intro.remove(), prefersReducedMotion ? 0 : 2600);
+  // Lightweight smooth scroll helper (native only)
+  const smoothScrollTo = (target) => {
+    if (typeof target === "number") {
+      window.scrollTo({ top: target, behavior: prefersReducedMotion ? "auto" : "smooth" });
+    } else if (target instanceof Element) {
+      target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
     }
-
-    // Always start at the top after intro (avoid landing on a deep-linked section like #hackathonwins)
-    if (window.location.hash) {
-      const cleanUrl = `${window.location.pathname}${window.location.search}`;
-      history.replaceState(null, "", cleanUrl);
-    }
-    window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
-
-  if (intro instanceof HTMLElement) {
-    // Typewriter effect (note: browsers clamp 1ms timers; this is as fast as allowed)
-    const fullText =
-      (introHello instanceof HTMLElement && introHello.dataset.text) || "Hello, I'm Tebogo.";
-
-    if (introHello instanceof HTMLElement) introHello.textContent = "";
-
-    // Slow, readable typing speed
-    const speedMs = 65;
-    let i = 0;
-
-    const typeNext = () => {
-      if (!(introHello instanceof HTMLElement)) return;
-      if (i >= fullText.length) {
-        // Done typing — add animated purple emoji
-        const sparkle = document.createElement("span");
-        sparkle.className = "intro-sparkle";
-        sparkle.textContent = " 💜";
-        sparkle.setAttribute("aria-hidden", "true");
-        introHello.appendChild(sparkle);
-        
-        // After sparkle appears, ALWAYS wait exactly 1.8 seconds then slowly fade out to site
-        window.setTimeout(() => {
-          finishIntro();
-        }, 1800); // Exactly 1.8 seconds pause to see sparkle, then fade
-        return;
-      }
-      introHello.textContent = fullText.slice(0, i + 1);
-      i += 1;
-      window.setTimeout(typeNext, speedMs);
-    };
-
-    // Always type (even if reduced motion is enabled); reduced motion only affects fades/scrolling.
-    requestAnimationFrame(typeNext);
-
-    const exitNow = () => {
-      finishIntro();
-    };
-
-    if (introSkip instanceof HTMLElement) {
-      introSkip.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        exitNow();
-      });
-      // Put focus on Enter button for keyboard users
-      window.setTimeout(() => introSkip.focus(), 0);
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") exitNow();
-    });
-
-  } else {
-    document.body.classList.remove("is-intro");
-  }
 
   // Scroll reveal animations
   const revealEls = Array.from(document.querySelectorAll("[data-reveal]"));
@@ -309,6 +240,19 @@
     });
   }
 
+  // Intercept hash links for consistent smooth behavior + nav close
+  document.addEventListener("click", (e) => {
+    const anchor = e.target instanceof Element ? e.target.closest("a[href^='#']") : null;
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href || href === "#") return;
+    const target = document.querySelector(href);
+    if (!(target instanceof Element)) return;
+    e.preventDefault();
+    closeNav();
+    smoothScrollTo(target);
+  });
+
   // Skills: auto-expand on scroll into section; auto-collapse when scrolling away
   const skillsSection = document.getElementById("skills");
   const skillsContent = document.querySelector("#skills [data-skills-content]");
@@ -469,7 +413,7 @@
     }
 
     if (shouldScroll) {
-      hackathonSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      smoothScrollTo(hackathonSection);
     }
   };
 
@@ -623,7 +567,7 @@
         setActive(it);
         setExpanded(false);
         // Scroll to keep the section in view
-        experience.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        smoothScrollTo(experience);
       });
     });
 
@@ -770,6 +714,7 @@
     const autoplayEnabled = slides.length > 1;
     const intervalMs = carousel.classList.contains("cert-carousel") ? 5200 : 4200;
     let timer = 0;
+    let inViewport = true;
 
     const stopAutoplay = () => {
       if (timer) window.clearInterval(timer);
@@ -784,7 +729,7 @@
     };
 
     const startAutoplay = () => {
-      if (!autoplayEnabled) return;
+      if (!autoplayEnabled || !inViewport || document.hidden) return;
       stopAutoplay();
       timer = window.setInterval(() => {
         if (isActiveSlideVideoPlaying()) return;
@@ -813,6 +758,21 @@
       if (document.hidden) stopAutoplay();
       else startAutoplay();
     });
+
+    if ("IntersectionObserver" in window) {
+      const carouselObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.target !== carousel) return;
+            inViewport = entry.isIntersecting && entry.intersectionRatio > 0.2;
+            if (inViewport) startAutoplay();
+            else stopAutoplay();
+          });
+        },
+        { root: null, threshold: [0, 0.2, 0.5] }
+      );
+      carouselObserver.observe(carousel);
+    }
 
     startAutoplay();
   });
@@ -863,6 +823,12 @@
     resize();
     window.addEventListener("resize", resize);
 
+    const deviceMemory = Number(navigator.deviceMemory || 0);
+    const cpuCores = Number(navigator.hardwareConcurrency || 4);
+    const lowPowerMode = prefersReducedMotion || (deviceMemory > 0 && deviceMemory <= 4) || cpuCores <= 4;
+    const frameIntervalMs = lowPowerMode ? 1000 / 30 : 1000 / 50;
+    let lastFrameTs = 0;
+
     const COLORS = [
       "rgba(147, 51, 234, 0.7)",
       "rgba(168, 85, 247, 0.6)",
@@ -902,7 +868,7 @@
         ctx.fillStyle = this.color;
         ctx.fill();
 
-        if (this.radius > 1.5) {
+        if (!lowPowerMode && this.radius > 1.5) {
           const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 3);
           g.addColorStop(0, this.color);
           g.addColorStop(1, "rgba(147, 51, 234, 0)");
@@ -912,15 +878,18 @@
       }
     }
 
-    const dist2 = (ax, ay, bx, by) => {
-      const dx = bx - ax;
-      const dy = by - ay;
-      return dx * dx + dy * dy;
-    };
-
     const particles = [];
-    const particleCount = Math.min(((width * height) / 8000) | 0, 120);
-    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    const getParticleCount = () => {
+      const density = lowPowerMode ? 13000 : 9000;
+      const cap = lowPowerMode ? 72 : 120;
+      return Math.max(20, Math.min(((width * height) / density) | 0, cap));
+    };
+    const rebuildParticles = () => {
+      particles.length = 0;
+      const count = getParticleCount();
+      for (let i = 0; i < count; i++) particles.push(new Particle());
+    };
+    rebuildParticles();
 
     const resolveCollision = (p1, p2, dx, dy, distance) => {
       if (distance === 0) return;
@@ -948,11 +917,16 @@
       p2.y += separationY;
     };
 
-    const CONNECT_DIST = 120;
+    const CONNECT_DIST = lowPowerMode ? 95 : 120;
     const CONNECT_DIST2 = CONNECT_DIST * CONNECT_DIST;
 
     let raf = 0;
-    const animate = () => {
+    const animate = (ts = 0) => {
+      if (ts - lastFrameTs < frameIntervalMs) {
+        raf = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTs = ts;
       ctx.clearRect(0, 0, width, height);
 
       for (let i = 0; i < particles.length; i++) {
@@ -994,10 +968,20 @@
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) cancelAnimationFrame(raf);
-      else raf = requestAnimationFrame(animate);
+      else {
+        lastFrameTs = 0;
+        raf = requestAnimationFrame(animate);
+      }
     });
+
+    const prevResize = resize;
+    window.removeEventListener("resize", prevResize);
+    const optimizedResize = () => {
+      prevResize();
+      rebuildParticles();
+    };
+    window.addEventListener("resize", optimizedResize, { passive: true });
 
     animate();
   }
 })();
-
